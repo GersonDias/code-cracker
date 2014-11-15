@@ -13,9 +13,28 @@ namespace CodeCracker.Test
     public class AssignSymbolAlignmentTest : CodeFixVerifier
     {
         [Fact]
+        public void WhenThereAreNoAssignmentStatementNoAnalysisAreCalled()
+        {
+            const string source = @"
+                public void Method() 
+                {
+                    Console.WriteLine(""This is a test"");
+                    Console.ReadLine();
+                };";
+
+            VerifyCSharpHasNoDiagnostics(source);
+        }
+
+
+
+        [Fact]
         public void WhenThereAreOnlyOneAssignStatementNoAnalysisAreCalled()
         {
-            const string source = @"var st = ""this is a string!"";";
+            const string source =
+                @"public void Method()
+                {
+                    var st = ""this is a string!""
+                }";
 
             VerifyCSharpHasNoDiagnostics(source);
         }
