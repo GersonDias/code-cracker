@@ -26,19 +26,71 @@ namespace CodeCracker
 
         public override void Initialize(AnalysisContext context)
         {
-            context.RegisterSyntaxNodeAction(SimpleAssigmentAnalyser, SyntaxKind.SimpleAssignmentExpression);
-            context.RegisterSyntaxNodeAction(VariableDeclarationAnalyser, SyntaxKind.VariableDeclaration);
+            context.RegisterSyntaxNodeAction(LocalDeclarationAnalyser, SyntaxKind.LocalDeclarationStatement);
+            //context.RegisterSyntaxNodeAction(VariableDeclarationAnalyser, SyntaxKind.VariableDeclaration);
         }
 
-        private void VariableDeclarationAnalyser(SyntaxNodeAnalysisContext context)
+        private void LocalDeclarationAnalyser(SyntaxNodeAnalysisContext context)
         {
             var semanticModel = context.SemanticModel;
+
             var localDeclaretionStatement = context.Node as LocalDeclarationStatementSyntax;
 
             if (localDeclaretionStatement == null) return;
+
+            var parentBlockStatements = localDeclaretionStatement.FirstAncestorOrSelf<BlockSyntax>()?.Statements;
+
+            var localDeclarationList = new List<LocalDeclarationStatementSyntax>();
+            for (int i = 0; i < parentBlockStatements.Value.Count(); i++)
+            {
+                var currentStatement = parentBlockStatements.Value[i];
+
+                if (currentStatement == localDeclaretionStatement)
+                {
+                    if (parentBlockStatements.Value.Count - 1 == i)
+                        return;
+
+                    if (i > 0)
+                    {
+                        var previousStatement = parentBlockStatements.Value[i - 1];
+                        if (previousStatement is LocalDeclarationStatementSyntax)
+                            return;
+                    }
+
+                    var nextStatement = parentBlockStatements.Value[i+1];
+                    if (nextStatement is LocalDeclarationStatementSyntax)
+                        localDeclarationList.Add(nextStatement as LocalDeclarationStatementSyntax);
+
+                    break;
+                }
+            }
+
+            if (localDeclarationList.Count > 0)
+            {
+                if (CheckDeclarationList(localDeclarationList))
+                {
+                    var diagnostic = Diagnostic.Create(Rule, localDeclaretionStatement.GetLocation(), "Assign alignment.", "Align '=' symbols in assign declarations.");
+                    context.ReportDiagnostic(diagnostic);
+                }
+            }
         }
 
-        private void SimpleAssigmentAnalyser(SyntaxNodeAnalysisContext context)
+        private bool CheckDeclarationList(List<LocalDeclarationStatementSyntax> localDeclarationList)
+        {
+            //var x = "teste";
+            //var x2 = "teste";
+
+            var trivias = localDeclarationList.Select(x => x.DescendantTrivia());
+            var tokens = trivias.Where(x => x.All(t => t.Token.IsKind(SyntaxKind.EqualsToken)));
+            //var t = trivias.;
+
+
+             var maxSpanOfEqualsToken = localDeclarationList.Max(x => x.DescendantTrivia().Where(i => i.IsKind(SyntaxKind.EqualsToken)).Select(y => y.SpanStart));
+
+            return localDeclarationList.Any(x => x.DescendantTrivia().Any(i => i.IsKind(SyntaxKind.EqualsToken) && i.SpanStart < maxSpanOfEqualsToken.ElementAt(0)));
+        }
+
+        private void VariableDeclarationAnalyser(SyntaxNodeAnalysisContext context)
         {
             
         }
