@@ -106,21 +106,6 @@ namespace CodeCracker.Test
             VerifyCSharpHasNoDiagnostics(source);
         }
 
-        [Fact]
-        public void WhenThereAreAEmptyLineAfterAssignmentStatementNoAnalysisAreCalled()
-        {
-            const string source = @"
-                public void Method()
-                {
-                    var variable = ""x"";
-
-                    var variable2 = ""y"";
-                }";
-
-            VerifyCSharpHasNoDiagnostics(source);
-        }
-
-
         protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
         {
             return new AssignStatementAlignmentAnalyser();
@@ -130,64 +115,5 @@ namespace CodeCracker.Test
         {
             return new AssignStatementAligmentCodeFixProvider();
         }
-
-        //        [Fact]
-        //        public void WhenThereAreOnlyOneAssignStatementNoAnalysisAreCalled()
-        //        {
-        //            const string source =
-        //                @"public void Method()
-        //                {
-        //                    var st = ""this is a string!""
-        //                }";
-
-        //            VerifyCSharpHasNoDiagnostics(source);
-        //        }
-
-        //        [Fact]
-        //        public void WhenNextLineIsBlanckNoAnalysisAreCalled()
-        //        {
-        //            string source =@"
-        //public void method()
-        //{
-        //    var st = ""this is a string!"";
-
-        //    Console.WriteLine(st);
-        //}";
-
-        //            VerifyCSharpHasNoDiagnostics(source);
-        //        }
-
-        //        [Fact]
-        //        public void WhenNextStatementIsntAssignStatetemeNoAnalysisAreCalled()
-        //        {
-        //            string source = @"
-        //public void method()
-        //{
-        //    var st = ""this is a string!"";
-        //    Console.WriteLine(st.Length);
-        //}";
-        //            VerifyCSharpHasNoDiagnostics(source);
-        //        }
-
-        //        [Fact]
-        //        public void WhenNextStatementIsAAssignStatementAndAssignSignIsntAllignAnalysisAreCalled()
-        //        {
-        //            string source =
-        //@"public void method()
-        //{
-        //    var st = ""this is a string!"";
-        //    var st2 = ""this is another string!"";
-        //}";
-
-        //            var expected = new DiagnosticResult
-        //            {
-        //                Id = AssignStatementAlignmentAnalyser.DiagnosticId,
-        //                Message = "Align assign symbol",
-        //                Severity = Microsoft.CodeAnalysis.DiagnosticSeverity.Info,
-        //                Locations = new[] { new DiagnosticResultLocation("Test0.cs", 2, 8) }
-        //            };
-
-        //            VerifyCSharpDiagnostic(source, expected);
-        //        }
     }
 }
