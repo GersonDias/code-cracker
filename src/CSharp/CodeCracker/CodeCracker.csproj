@@ -47,6 +47,8 @@
     <Compile Include="Reliability\UseConfigureAwaitFalseCodeFixProvider.cs" />
     <Compile Include="Style\AlwaysUseVarAnalyzer.cs" />
     <Compile Include="Style\AlwaysUseVarCodeFixProvider.cs" />
+    <Compile Include="Style\AssignStatementAligmentCodeFixProvider.cs" />
+    <Compile Include="Style\AssignStatementAlignmentAnalyser.cs" />
     <Compile Include="Style\ConvertLambdaExpressionToMethodGroupAnalyzer.cs" />
     <Compile Include="Style\ConvertLambdaExpressionToMethodGroupFixProvider.cs" />
     <Compile Include="Style\TaskNameAsyncCodeFixProvider.cs" />
