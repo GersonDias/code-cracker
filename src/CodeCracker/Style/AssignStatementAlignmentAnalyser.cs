@@ -10,7 +10,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Diagnostics;
 
-namespace CodeCracker
+namespace CodeCracker.Style
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class AssignStatementAlignmentAnalyser : DiagnosticAnalyzer

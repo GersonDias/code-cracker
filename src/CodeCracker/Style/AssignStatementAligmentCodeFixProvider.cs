@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis.CodeFixes;
 
-namespace CodeCracker
+namespace CodeCracker.Style
 {
     public class AssignStatementAligmentCodeFixProvider : CodeFixProvider
     {
