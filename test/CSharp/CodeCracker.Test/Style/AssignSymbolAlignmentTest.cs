@@ -12,108 +12,108 @@ namespace CodeCracker.Test
 {
     public class AssignSymbolAlignmentTest : CodeFixVerifier
     {
-        [Fact]
-        public void WhenThereAreNoAssignmentStatementNoAnalysisAreCalled()
-        {
-            const string source = @"
-                public void Method() 
-                {
-                    Console.WriteLine(""This is a test"");
-                    Console.ReadLine();
-                };";
+        //[Fact]
+        //public void WhenThereAreNoAssignmentStatementNoAnalysisAreCalled()
+        //{
+        //    const string source = @"
+        //        public void Method() 
+        //        {
+        //            Console.WriteLine(""This is a test"");
+        //            Console.ReadLine();
+        //        };";
 
-            VerifyCSharpHasNoDiagnostics(source);
-        }
+        //    VerifyCSharpHasNoDiagnostics(source);
+        //}
 
-        [Fact]
-        public void WhenthereAreOnlyOneAssignmentStatementNoAnalysisAreCalled()
-        {
-            const string source = @"
-                public void Method()
-                {
-                    var variable = ""x"";
-                }";
+        //[Fact]
+        //public void WhenthereAreOnlyOneAssignmentStatementNoAnalysisAreCalled()
+        //{
+        //    const string source = @"
+        //        public void Method()
+        //        {
+        //            var variable = ""x"";
+        //        }";
 
-            VerifyCSharpHasNoDiagnostics(source);
-        }
+        //    VerifyCSharpHasNoDiagnostics(source);
+        //}
 
-        [Fact]
-        public void WhenThereAreOneAssigmentAndAnotherStatementTypeNoAnalysisAreCalled()
-        {
-            const string source = @"
-                public void Method()
-                {
-                    var variable = ""x"";
-                    Console.WriteLine(variable);
-                }";
+        //[Fact]
+        //public void WhenThereAreOneAssigmentAndAnotherStatementTypeNoAnalysisAreCalled()
+        //{
+        //    const string source = @"
+        //        public void Method()
+        //        {
+        //            var variable = ""x"";
+        //            Console.WriteLine(variable);
+        //        }";
 
-            VerifyCSharpHasNoDiagnostics(source);
-        }
+        //    VerifyCSharpHasNoDiagnostics(source);
+        //}
 
-        [Fact]
-        public void WhenThereAreTwoAssignmentStatementAnAnalysisAreCalled()
-        {
-            const string source = @"
-                public void Method()
-                {
-                    var variable = ""x"";
-                    var variable2 = ""y"";
-                }";
+        //[Fact]
+        //public void WhenThereAreTwoAssignmentStatementAnAnalysisAreCalled()
+        //{
+        //    const string source = @"
+        //        public void Method()
+        //        {
+        //            var variable = ""x"";
+        //            var variable2 = ""y"";
+        //        }";
 
-            var expected = new DiagnosticResult
-            {
-                Id        = AssignStatementAlignmentAnalyser.DiagnosticId,
-                Message   = "Assign alignment.",
-                Severity  = Microsoft.CodeAnalysis.DiagnosticSeverity.Info,
-                Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 21) }
-            };
+        //    var expected = new DiagnosticResult
+        //    {
+        //        Id        = AssignStatementAlignmentAnalyser.DiagnosticId,
+        //        Message   = "Assign alignment.",
+        //        Severity  = Microsoft.CodeAnalysis.DiagnosticSeverity.Info,
+        //        Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 21) }
+        //    };
 
-            VerifyCSharpDiagnostic(source, expected);
-        }
+        //    VerifyCSharpDiagnostic(source, expected);
+        //}
 
-        [Fact]
-        public void WhenThereAreThreeAssignmentStatementAnAnalysisAreCalled()
-        {
-            const string source = @"
-                public void Method()
-                {
-                    var variable = ""x"";
-                    var variable2 = ""y"";
-                    var variable3  = ""z"";
-                }";
+        //[Fact]
+        //public void WhenThereAreThreeAssignmentStatementAnAnalysisAreCalled()
+        //{
+        //    const string source = @"
+        //        public void Method()
+        //        {
+        //            var variable = ""x"";
+        //            var variable2 = ""y"";
+        //            var variable3  = ""z"";
+        //        }";
 
-            var expected = new DiagnosticResult
-            {
-                Id = AssignStatementAlignmentAnalyser.DiagnosticId,
-                Message = "Assign alignment.",
-                Severity = Microsoft.CodeAnalysis.DiagnosticSeverity.Info,
-                Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 21) }
-            };
+        //    var expected = new DiagnosticResult
+        //    {
+        //        Id = AssignStatementAlignmentAnalyser.DiagnosticId,
+        //        Message = "Assign alignment.",
+        //        Severity = Microsoft.CodeAnalysis.DiagnosticSeverity.Info,
+        //        Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 21) }
+        //    };
 
-            VerifyCSharpDiagnostic(source, expected);
-        }
+        //    VerifyCSharpDiagnostic(source, expected);
+        //}
 
-        [Fact]
-        public void WhenAssigmentStatementAreAlignedNoAnalysisAreCalled()
-        {
-            const string source = @"
-                public void Method()
-                {
-                    var variable  = ""x"";
-                    var variable2 = ""y"";
-                }";
+        //[Fact]
+        //public void WhenAssigmentStatementAreAlignedNoAnalysisAreCalled()
+        //{
+        //    const string source = @"
+        //        public void Method()
+        //        {
+        //            var variable  = ""x"";
+        //            var variable2 = ""y"";
+        //        }";
 
-            VerifyCSharpHasNoDiagnostics(source);
-        }
+        //    VerifyCSharpHasNoDiagnostics(source);
+        //}
 
-        protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-        {
-            return new AssignStatementAlignmentAnalyser();
-        }
+        //protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
+        //{
+        //    return new AssignStatementAlignmentAnalyser();
+        //}
 
-        protected override CodeFixProvider GetCSharpCodeFixProvider()
-        {
-            return new AssignStatementAligmentCodeFixProvider();
-        }
+        //protected override CodeFixProvider GetCSharpCodeFixProvider()
+        //{
+        //    return new AssignStatementAligmentCodeFixProvider();
+        //}
     }
 }
