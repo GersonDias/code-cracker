@@ -15,105 +15,132 @@ namespace CodeCracker.Style
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class AssignStatementAlignmentAnalyser : DiagnosticAnalyzer
     {
-        //public const string DiagnosticId = "CodeCracker.AssignStatementAlignmentAnalyser";
-        //internal const string Title = "Assign Statement Align";
-        //internal const string MessageFormat = "{0}";
-        //internal const string Category = "Syntax";
+		internal const string Title = "Align consecutives assign statements";
+		internal const string MessageFormat = "{0}";
+		internal const string Category = "Style";
+		internal const string Description = "Align consecutives assign statements to improve readability";
 
-        //internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Info, true);
+		internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(
+			DiagnosticId.AssignStatementAligment.ToDiagnosticId(),
+			Title,
+			MessageFormat,
+			Category,
+			DiagnosticSeverity.Hidden,
+			isEnabledByDefault: true,
+			description: Description,
+			helpLink: HelpLink.ForDiagnostic(DiagnosticId.AssignStatementAligment)
+		);
 
-        //public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
-        //public override void Initialize(AnalysisContext context)
-        //{
-        //    context.RegisterSyntaxNodeAction(LocalDeclarationAnalyser, SyntaxKind.LocalDeclarationStatement);
-        //    context.RegisterSyntaxNodeAction(VariableDeclarationAnalyser, SyntaxKind.VariableDeclaration);
-        //}
+		public override void Initialize(AnalysisContext context) => context.RegisterSyntaxNodeAction(AnalyseStatmentAlignment, SyntaxKind.VariableDeclaration);
 
-        //private void LocalDeclarationAnalyser(SyntaxNodeAnalysisContext context)
-        //{
-        //    var semanticModel = context.SemanticModel;
+		private void AnalyseStatmentAlignment(SyntaxNodeAnalysisContext context)
+		{
+			var assignStatement = context.Node as VariableDeclarationSyntax;
 
-        //    var localDeclaretionStatement = context.Node as LocalDeclarationStatementSyntax;
+			if (assignStatement == null || !assignStatement.ToFullString().Contains("=")) return;
 
-        //    if (localDeclaretionStatement == null) return;
+			var parentCodeBlock = assignStatement.Parent.Parent;
+			var parentCodeBlockText = parentCodeBlock.GetText();
 
-        //    var parentBlockStatements = localDeclaretionStatement.FirstAncestorOrSelf<BlockSyntax>()?.Statements;
+			for (int i = 0; i < parentCodeBlockText.Lines.Count - 1; i++)
+			{
+				var currentStatement = parentCodeBlockText.Lines[i].ToString();
 
-        //    var localDeclarationList = new List<LocalDeclarationStatementSyntax>();
-        //    for (int i = 0; i < parentBlockStatements.Value.Count(); i++)
-        //    {
-        //        var currentStatement = parentBlockStatements.Value[i];
+				if (currentStatement.Trim() == assignStatement.Parent.ToString())
+				{
+					var nextStatement = parentCodeBlockText.Lines[i + 1];
 
-        //        if (currentStatement == localDeclaretionStatement)
-        //        {
-        //            if (parentBlockStatements.Value.Count - 1 == i)
-        //                return;
+					if (nextStatement.ToString().Contains("=") && nextStatement.ToString().IndexOf('=') != currentStatement.IndexOf('='))
+					{
+						var equals = assignStatement.DescendantTokens().First(x => x.RawKind == (int)SyntaxKind.EqualsToken);
+						
+						var diagnostic = Diagnostic.Create(Rule, equals.GetLocation(), "Consider to align equals symbols to improve readability");
+						context.ReportDiagnostic(diagnostic);
+					}
+				}
+			}
 
-        //            if (i > 0)
-        //            {
-        //                var previousStatement = parentBlockStatements.Value[i - 1];
-        //                if (previousStatement is LocalDeclarationStatementSyntax)
-        //                    break;
-        //            }
+			var currentLine = parentCodeBlock.GetText().Lines.Where(x => x == assignStatement.GetText().Lines.First());
+			
+			var c = context;
+			return;
+		}
+		
+		//private void LocalDeclarationAnalyser(SyntaxNodeAnalysisContext context)
+		//{
+		//    var semanticModel = context.SemanticModel;
 
-        //            var nextStatement = parentBlockStatements.Value[i + 1];
-        //            if (nextStatement is LocalDeclarationStatementSyntax)
-        //            {
-        //                localDeclarationList.Add(currentStatement as LocalDeclarationStatementSyntax);
-        //                for (int j = i + 1; j < parentBlockStatements.Value.Count(); j++)
-        //                {
-        //                    if (parentBlockStatements.Value[j] is LocalDeclarationStatementSyntax)
-        //                    {
-        //                        localDeclarationList.Add(parentBlockStatements.Value[j] as LocalDeclarationStatementSyntax);
-        //                    }
-        //                }
-        //            }
+		//    var localDeclaretionStatement = context.Node as LocalDeclarationStatementSyntax;
 
-        //            break;
-        //        }
-        //    }
+		//    if (localDeclaretionStatement == null) return;
 
-        //    if (localDeclarationList.Count > 0)
-        //    {
-        //        if (CheckDeclarationList(localDeclarationList))
-        //        {
-        //            var diagnostic = Diagnostic.Create(Rule, localDeclaretionStatement.GetLocation(), "Assign alignment.", "Align '=' symbols in assign declarations.");
-        //            context.ReportDiagnostic(diagnostic);
-        //        }
-        //    }
-        //}
+		//    var parentBlockStatements = localDeclaretionStatement.FirstAncestorOrSelf<BlockSyntax>()?.Statements;
 
-        //private bool CheckDeclarationList(List<LocalDeclarationStatementSyntax> localDeclarationList)
-        //{
-        //    var x = "teste";
-        //    var x2 = "teste";
+		//    var localDeclarationList = new List<LocalDeclarationStatementSyntax>();
+		//    for (int i = 0; i < parentBlockStatements.Value.Count(); i++)
+		//    {
+		//        var currentStatement = parentBlockStatements.Value[i];
 
-        //    if (localDeclarationList.Count > 0)
-        //    {
-        //        var maxEqualsSymbolSpan = localDeclarationList.Select(x => x.GetText().ToString()).Max(t => t.IndexOf('='));
-        //        if (localDeclarationList.Any(x => x.GetText().ToString().IndexOf('=') != maxEqualsSymbolSpan))
-        //            return true;
-        //    }
+		//        if (currentStatement == localDeclaretionStatement)
+		//        {
+		//            if (parentBlockStatements.Value.Count - 1 == i)
+		//                return;
 
-        //    return false;
-        //}
+		//            if (i > 0)
+		//            {
+		//                var previousStatement = parentBlockStatements.Value[i - 1];
+		//                if (previousStatement is LocalDeclarationStatementSyntax)
+		//                    break;
+		//            }
 
-        //private void VariableDeclarationAnalyser(SyntaxNodeAnalysisContext context)
-        //{
+		//            var nextStatement = parentBlockStatements.Value[i + 1];
+		//            if (nextStatement is LocalDeclarationStatementSyntax)
+		//            {
+		//                localDeclarationList.Add(currentStatement as LocalDeclarationStatementSyntax);
+		//                for (int j = i + 1; j < parentBlockStatements.Value.Count(); j++)
+		//                {
+		//                    if (parentBlockStatements.Value[j] is LocalDeclarationStatementSyntax)
+		//                    {
+		//                        localDeclarationList.Add(parentBlockStatements.Value[j] as LocalDeclarationStatementSyntax);
+		//                    }
+		//                }
+		//            }
 
-        //}
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
+		//            break;
+		//        }
+		//    }
 
-        public override void Initialize(AnalysisContext context)
-        {
-            throw new NotImplementedException();
-        }
-    }
+		//    if (localDeclarationList.Count > 0)
+		//    {
+		//        if (CheckDeclarationList(localDeclarationList))
+		//        {
+		//            var diagnostic = Diagnostic.Create(Rule, localDeclaretionStatement.GetLocation(), "Assign alignment.", "Align '=' symbols in assign declarations.");
+		//            context.ReportDiagnostic(diagnostic);
+		//        }
+		//    }
+		//}
+
+		//private bool CheckDeclarationList(List<LocalDeclarationStatementSyntax> localDeclarationList)
+		//{
+		//    var x = "teste";
+		//    var x2 = "teste";
+
+		//    if (localDeclarationList.Count > 0)
+		//    {
+		//        var maxEqualsSymbolSpan = localDeclarationList.Select(x => x.GetText().ToString()).Max(t => t.IndexOf('='));
+		//        if (localDeclarationList.Any(x => x.GetText().ToString().IndexOf('=') != maxEqualsSymbolSpan))
+		//            return true;
+		//    }
+
+		//    return false;
+		//}
+
+		//private void VariableDeclarationAnalyser(SyntaxNodeAnalysisContext context)
+		//{
+
+		//}
+
+	}
 }
