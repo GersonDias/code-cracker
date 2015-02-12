@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.CodeAnalysis.CodeFixes;
-using Microsoft.CodeAnalysis.Diagnostics;
+﻿using System.Threading.Tasks;
 using TestHelper;
 using Xunit;
 using CodeCracker.Style;
 
 namespace CodeCracker.Test
 {
-    public class AssignSymbolAlignmentTest : CodeFixTest<AssignStatementAlignmentAnalyser, AssignStatementAligmentCodeFixProvider>
+	public class AssignSymbolAlignmentTest : CodeFixTest<AssignStatementAlignmentAnalyser, AssignStatementAligmentCodeFixProvider>
     {
 		[Fact]
 		public async Task WhenThereAreaNoAssignmentStatementNoAnalysisAreCreated()
@@ -68,13 +62,54 @@ namespace CodeCracker.Test
 			const string source = @"
 		        public void Method()
 		        {
-		            var a = ""1"";
-		            var ab = ""2"";
+					var a = ""1"";
+					var ab = ""2"";
 					var abc = ""3"";
 					var abcd = ""4"";
 		        }";
 
-			await VerifyCSharpDiagnosticAsync(source, CreateDiagnostic(4, 19));
+			await VerifyCSharpDiagnosticAsync(source, 
+				CreateDiagnostic(4, 12),
+				CreateDiagnostic(5, 13),
+				CreateDiagnostic(6, 14));
+		}
+
+		[Fact]
+		public async Task WhenThereAreMixedStatementsAnalysisAreCreatedCorrectly()
+		{
+			const string source = @"
+				public void Method()
+				{
+					var a = ""1"";
+					Console.WriteLine(a);
+					var b = ""3"";
+
+					var bc = ""4"";
+					string abc = ""5"";
+				}";
+
+			await VerifyCSharpDiagnosticAsync(source,
+				CreateDiagnostic(8, 13));
+		}
+
+		[Fact]
+		public async Task WhenStatementsAreNotAlignedFixCanDoTheWork()
+		{
+			const string source = @"
+				public void Method()
+				{
+					var a = ""1"";
+					var abc = ""2"";
+				}";
+
+			const string fix = @"
+				public void Method()
+				{
+					var a   = ""1"";
+					var abc = ""2"";
+				}";
+
+			await VerifyCSharpFixAsync(source, fix);
 		}
 
 		[Fact]
@@ -141,61 +176,5 @@ namespace CodeCracker.Test
 
 			return diagnostic;
 		}
-
-
-		//[Fact]
-		//public void WhenThereAreTwoAssignmentStatementAnAnalysisAreCalled()
-		//{
-		//    const string source = @"
-		//        public void Method()
-		//        {
-		//            var variable = ""x"";
-		//            var variable2 = ""y"";
-		//        }";
-
-		//    var expected = new DiagnosticResult
-		//    {
-		//        Id        = AssignStatementAlignmentAnalyser.DiagnosticId,
-		//        Message   = "Assign alignment.",
-		//        Severity  = Microsoft.CodeAnalysis.DiagnosticSeverity.Info,
-		//        Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 21) }
-		//    };
-
-		//    VerifyCSharpDiagnostic(source, expected);
-		//}
-
-		//[Fact]
-		//public void WhenThereAreThreeAssignmentStatementAnAnalysisAreCalled()
-		//{
-		//    const string source = @"
-		//        public void Method()
-		//        {
-		//            var variable = ""x"";
-		//            var variable2 = ""y"";
-		//            var variable3  = ""z"";
-		//        }";
-
-		//    var expected = new DiagnosticResult
-		//    {
-		//        Id = AssignStatementAlignmentAnalyser.DiagnosticId,
-		//        Message = "Assign alignment.",
-		//        Severity = Microsoft.CodeAnalysis.DiagnosticSeverity.Info,
-		//        Locations = new[] { new DiagnosticResultLocation("Test0.cs", 4, 21) }
-		//    };
-
-		//    VerifyCSharpDiagnostic(source, expected);
-		//}
-
-
-
-		//protected override DiagnosticAnalyzer GetCSharpDiagnosticAnalyzer()
-		//{
-		//    return new AssignStatementAlignmentAnalyser();
-		//}
-
-		//protected override CodeFixProvider GetCSharpCodeFixProvider()
-		//{
-		//    return new AssignStatementAligmentCodeFixProvider();
-		//}
 	}
 }
