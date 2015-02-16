@@ -18,7 +18,7 @@ namespace CodeCracker.Style
 		internal const string Title = "Align consecutives assign statements";
 		internal const string MessageFormat = "{0}";
 		internal const string Category = "Style";
-		internal const string Description = "Align consecutives assign statements to improve readability";
+		internal const string Description = "Align consecutives assign statements could improve readability";
 
 		internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(
 			DiagnosticId.AssignStatementAligment.ToDiagnosticId(),
@@ -55,7 +55,7 @@ namespace CodeCracker.Style
 					{
 						var equals = assignStatement.DescendantTokens().First(x => x.RawKind == (int)SyntaxKind.EqualsToken);
 						
-						var diagnostic = Diagnostic.Create(Rule, equals.GetLocation(), "Consider to align equals symbols to improve readability");
+						var diagnostic = Diagnostic.Create(Rule, equals.GetLocation(), Description);
 						context.ReportDiagnostic(diagnostic);
 					}
 				}
