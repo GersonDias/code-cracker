@@ -35,8 +35,6 @@ namespace CodeCracker.Style
 			var semanticModel = await document.GetSemanticModelAsync(cancellationToken);
 			var solution = new StringBuilder();
 
-			//var desc = statements.SelectMany(x => x.DescendantTokens());
-
 			var higherStatement = statements.Max(x => x.ToFullString().IndexOf('='));
 			var higherSpan = higherStatement;
 			var root = await document.GetSyntaxRootAsync();
@@ -57,13 +55,9 @@ namespace CodeCracker.Style
 					var text = new TextChange(equalsToken.Span, "".PadRight(higherSpan - statement.ToFullString().IndexOf('=')));
 
 					var spaces = " ".PadRight(higherSpan - statement.ToFullString().IndexOf('=') + 1, ' ');
-                    var newRoot = root.ReplaceTrivia(statement.DescendantTrivia().ElementAt(2), SyntaxFactory.ParseTrailingTrivia(spaces));
+                    var newRoot = root.ReplaceTrivia(statement.DescendantTrivia(), SyntaxFactory.ParseTrailingTrivia(spaces));
 					newDocument = newDocument.WithSyntaxRoot(newRoot);
 				}
-				/*else
-				{
-					solution.AppendLine(statement.ToFullString());
-				}*/
 			}
 			
 			return newDocument;
